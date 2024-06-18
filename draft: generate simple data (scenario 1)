@@ -1,0 +1,73 @@
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("splatter")
+BiocManager::install("scater")
+install.packages("ggplot2")
+
+library(splatter)
+library(scater)
+library(ggplot2)
+
+
+set.seed(123)  # Set random seeds to ensure repeatable results 设置随机种子以确保结果可重复
+
+# Define functions for generating data 定义生成数据的函数
+generate_sim_data <- function(p, q, clusters, n) {
+  # Generate basic dataset 生成基础数据集
+  params <- newSplatParams()
+  params <- setParam(params, "nGenes", p)
+  params <- setParam(params, "batchCells", n)
+  params <- setParam(params, "group.prob", rep(1/clusters, clusters))
+  
+  # Simulating data 模拟数据
+  sim <- splatSimulate(params, method = "groups")
+  
+  # Extracting data 提取数据
+  counts <- counts(sim)
+  true_labels <- colData(sim)$Group
+  
+  # Select influencing features 选择影响特征
+  influence_genes <- sample(1:p, q)
+  noise_genes <- setdiff(1:p, influence_genes)
+  
+  # Generate data that affects features 生成影响特征的数据
+  for (i in 1:clusters) {
+    idx <- which(true_labels == paste0("Group", i))
+    counts[influence_genes, idx] <- counts[influence_genes, idx] + rnorm(length(idx) * q, mean = i * 2, sd = 1)
+  }
+  
+  return(list(counts = t(counts), true_labels = true_labels))
+}
+
+# Parameter settings 参数设置
+p <- 100  # Total number of features 总特征数
+q <- 3    # Number of influencing features 影响特征数
+clusters <- 6  # Number of clusters 聚类数
+n <- 200  # Number of data points 数据点数量
+
+# Generating data 生成数据
+sim_data <- generate_sim_data(p, q, clusters, n)
+counts <- sim_data$counts
+true_labels <- sim_data$true_labels
+
+# PCA
+pca <- prcomp(counts, scale. = TRUE)
+pca_data <- data.frame(pca$x[, 1:2])  # 提取前两个主成分
+
+# K-means
+kmeans_result <- kmeans(pca_data, centers = clusters, nstart = 25)
+pca_data$cluster <- as.factor(kmeans_result$cluster)
+
+# Visualization results 可视化结果
+ggplot(pca_data, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(size = 2) +
+  labs(title = "PCA + K-means Clustering", x = "Principal Component 1", y = "Principal Component 2") +
+  theme_minimal()
+
+# PCA image displaying real labels 显示真实标签的PCA图
+pca_data$true_labels <- as.factor(true_labels)
+ggplot(pca_data, aes(x = PC1, y = PC2, color = true_labels)) +
+  geom_point(size = 2) +
+  labs(title = "PCA with True Labels", x = "Principal Component 1", y = "Principal Component 2") +
+  theme_minimal()
+
