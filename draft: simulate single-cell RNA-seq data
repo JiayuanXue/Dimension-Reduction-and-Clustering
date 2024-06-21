@@ -1,0 +1,59 @@
+library(splatter)
+library(scater)
+library(SingleCellExperiment)
+library(BiocParallel)
+library(readr)
+library(dplyr)
+
+# Function: Load Tung dataset  函数：加载Tung数据集
+loadTungDataset <- function(filepath) {
+  counts <- read_tsv(filepath, col_types = cols(.default = col_integer(), X1 = col_character()))
+  counts <- select(counts, -X1)
+  counts <- as.matrix(counts)
+  rownames(counts) <- paste0("G", seq_len(nrow(counts)))
+  return(counts)
+}
+
+# File path  文件路径
+filepath <- "\\\\iona.sms.ed.ac.uk\\home\\s2494280\\Win7\\Desktop\\Tung.txt"
+
+# Load Dataset 加载数据集
+counts_matrix <- loadTungDataset(filepath)
+
+# Simplified simulation data function, using only Splat  简化的模拟数据函数，只使用Splat
+simData <- function(counts, models = c("Splat"), seed = 1, verbose = FALSE, bp = SerialParam()) {
+  ttime <- system.time({
+    set.seed(seed)
+    sims <- list(Real = SingleCellExperiment(assays = list(counts = counts)))
+    
+    if ("Splat" %in% models) {
+      message("***ADDING SPLAT***")
+      tt <- system.time(params <- splatEstimate(counts))
+      timings <- system.time(
+        sims$Splat <- splatSimulate(params, verbose = verbose, seed = seed)
+      )[3]
+      print(paste("Splat Estimation Time: ", tt[3]))
+      print(paste("Splat Simulation Time: ", timings))
+    }
+  })
+  
+  message("#### DONE ", ttime[3] / 60 / 60, " hours ####")
+  
+  return(sims)
+}
+
+# Run simplified simulation data functions  运行简化的模拟数据函数
+sims <- simData(counts_matrix)
+
+
+
+# View simulation data  查看模拟数据
+simulated_data <- assays(sims$Splat)$counts
+head(simulated_data)
+
+
+# Save simulation data to a file  保存模拟数据到文件
+setwd("\\\\iona.sms.ed.ac.uk\\home\\s2494280\\Win7\\Desktop")
+write.csv(as.data.frame(simulated_data), file = "simulated_data.csv", row.names = TRUE)
+
+
