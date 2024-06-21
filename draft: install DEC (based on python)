@@ -1,0 +1,27 @@
+!pip install numpy protobuf
+!git clone https://github.com/BVLC/caffe.git
+!cd caffe && git checkout windows
+!cd caffe && scripts/build_win.cmd
+import sys
+
+sys.path.append('C:\Projects\caffe/python')  
+import caffe
+# Test whether the import was successful or not 测试导入成功与否
+print("Caffe successfully imported.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
