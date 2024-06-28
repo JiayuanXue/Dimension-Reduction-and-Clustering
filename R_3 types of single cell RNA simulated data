@@ -1,0 +1,149 @@
+install.packages("BiocManager")
+BiocManager::install("splatter")
+
+
+library(splatter)
+
+# Define simulation functions 定义模拟函数
+Simulation <- function(nGroups, nGenes, batchCells, mid, sigma){
+  method <- 'groups'
+  
+  group.prob <- rep(1, nGroups) / nGroups
+  
+  sim <- splatSimulate(group.prob=group.prob, nGenes=nGenes, batchCells=batchCells,
+                       dropout.type="experiment", method=method, seed=0,
+                       dropout.shape=-1, dropout.mid=mid, de.facScale=sigma)
+  
+  counts     <- as.data.frame(as.matrix(t(counts(sim))))
+  truecounts <- as.data.frame(t(assays(sim)$TrueCounts))
+  
+  cellinfo   <- as.data.frame(colData(sim))
+  geneinfo   <- as.data.frame(rowData(sim))
+  
+  return(list('truecounts'=truecounts, 'counts'=counts, 'cellinfo'=cellinfo, 'geneinfo'=geneinfo))  
+}
+
+# Set parameters 设置参数
+# 
+# 
+# tpye 1: dropout
+# name <- 'dropout3 or 6_X', X belong to [0.0,0.5,1.0,1.5,2.0]
+# sigma <- 0.3
+# ngroup <- 3 or 6
+# 
+# 
+# tpye 2: low signal
+# name <- 'signal3_X', X belong to [0.1, 0.15, 0.2, 0.25]
+name <- 'signal3_0.25'
+mid <- 0
+sigma <- 0.25
+ngroup <- 3
+
+# Calling simulation functions 调用模拟函数
+sce <- Simulation(nGroups=ngroup, nGenes=5000, batchCells=3000, mid=mid, sigma=sigma)
+truecounts <- sce$truecounts
+counts <- sce$counts
+cellinfo <- sce$cellinfo
+geneinfo <- sce$geneinfo
+
+# Save data to csv file 保存数据到文件
+save_simulated_data <- function(name, truecounts, counts, cellinfo, geneinfo) {
+  true_zero_counts <- sum(truecounts == 0) 
+  raw_zero_counts <- sum(counts == 0)
+  true_non_zero_counts <- sum(truecounts != 0)
+  
+  numerator <- raw_zero_counts - true_zero_counts
+  denominator <- true_non_zero_counts
+  dropout_rate <- numerator / denominator
+  dropout_rate <- round(dropout_rate * 100, 2)
+  
+  write.csv(truecounts, paste0(name, "_truecounts.csv"))
+  write.csv(counts, paste0(name, "_counts.csv"))
+  write.csv(cellinfo, paste0(name, "_cellinfo.csv"))
+  write.csv(geneinfo, paste0(name, "_geneinfo.csv"))
+  write.csv(data.frame(dropout_rate = dropout_rate), paste0(name, "_dropout_rate.csv"))
+}
+
+# Save simulation data
+save_simulated_data(name, truecounts, counts, cellinfo, geneinfo)
+
+
+# Save the dataset as a CSV file 将数据集保存为 CSV 文件
+desktop_path <- "C:/Users/s2494280/Desktop"
+write.csv(counts, file.path(desktop_path, "signal3_0.25.csv"), row.names = FALSE)
+write.csv(cellinfo, file.path(desktop_path, "signal3_cellinfo.csv"), row.names = FALSE)
+write.csv(geneinfo, file.path(desktop_path, "signal3_geneinfo.csv"), row.names = FALSE)
+# 
+#
+# 
+# 
+# tpye 3: imbalanced
+library(SingleCellExperiment)
+library(splatter)
+
+# Define the Imb-Simulation function 定义Imb_Simulation函数
+Imb_Simulation <- function(group_prob, nGroups, nGenes, batchCells, mid, sigma){
+  method <- 'groups'
+  
+  group.prob <- c(group_prob)
+  
+  sim <- splatSimulate(group.prob=group.prob, nGenes=nGenes, batchCells=batchCells,
+                       dropout.type="experiment", method=method, seed=0,
+                       dropout.shape=-1, dropout.mid=mid, de.facScale=sigma)
+  
+  counts     <- as.data.frame(as.matrix(t(counts(sim))))
+  truecounts <- as.data.frame(t(assays(sim)$TrueCounts))
+  
+  cellinfo   <- as.data.frame(colData(sim))
+  geneinfo   <- as.data.frame(rowData(sim))
+  
+  return(list('truecounts'=truecounts, 'counts'=counts, 'cellinfo'=cellinfo, 'geneinfo'=geneinfo))  
+}
+
+# Calculate the function of group_probe 计算group_prob的函数
+calculate_group_prob <- function(retention, ngroup){
+  b <- (1 - retention) / (ngroup - 1)
+  proportion <- c(retention + (0:(ngroup-1)) * b)
+  group_prob <- proportion / sum(proportion)
+  return(group_prob)
+}
+
+# Parameter settings 参数设置
+# name <- 'imbalanced6_X', X belong to [0.1, 0.3, 0.7, 0.9]
+name <- 'imbalanced6_0.9'
+mid <- 0.0
+sigma <- 0.4
+ngroup <- 6
+retention <- 0.9
+n_cells <- 1500
+
+# Calculate group_probe
+group_prob <- calculate_group_prob(retention=retention, ngroup=ngroup)
+print(group_prob)
+
+# Calling the Imb-Simulation function 调用Imb_Simulation函数
+sce <- Imb_Simulation(group_prob=group_prob, nGroups=ngroup, nGenes=5000, batchCells=n_cells, mid=mid, sigma=sigma)
+
+# Get results 获取结果
+truecounts <- sce$truecounts
+counts <- sce$counts
+cellinfo <- sce$cellinfo
+geneinfo <- sce$geneinfo
+
+# Functions for saving simulated data 保存模拟数据的函数
+save_simulated_data <- function(name, truecounts, counts, cellinfo, geneinfo) {
+  write.csv(truecounts, paste0(name, "_truecounts.csv"), row.names = FALSE)
+  write.csv(counts, paste0(name, "_counts.csv"), row.names = FALSE)
+  write.csv(cellinfo, paste0(name, "_cellinfo.csv"), row.names = FALSE)
+  write.csv(geneinfo, paste0(name, "_geneinfo.csv"), row.names = FALSE)
+}
+
+# Save simulation data 保存模拟数据
+save_simulated_data(name, truecounts, counts, cellinfo, geneinfo)
+
+
+
+# Save the dataset as a CSV file
+write.csv(counts, file.path(desktop_path, "imbalanced6_0.9.csv"), row.names = FALSE)
+write.csv(cellinfo, file.path(desktop_path, "imbalanced6_0.9_cellinfo.csv"), row.names = FALSE)
+write.csv(geneinfo, file.path(desktop_path, "imbalanced6_0.9_geneinfo.csv"), row.names = FALSE)
