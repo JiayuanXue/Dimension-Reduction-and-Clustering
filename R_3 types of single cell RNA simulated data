@@ -27,16 +27,15 @@ Simulation <- function(nGroups, nGenes, batchCells, mid, sigma){
 # 
 # 
 # tpye 1: dropout
-# name <- 'dropout3 or 6_X', X belong to [0.0,0.5,1.0,1.5,2.0]
+# name <- 'dropout3 or 6_0'     [0.0,0.5,1.0,1.5,2.0]
 # sigma <- 0.3
-# ngroup <- 3 or 6
+# ngroup <- 3      or ngroup <- 6
 # 
 # 
 # tpye 2: low signal
-# name <- 'signal3_X', X belong to [0.1, 0.15, 0.2, 0.25]
-name <- 'signal3_0.25'
+name <- 'signal3_0.1'  # [0.1, 0.15, 0.2, 0.25]
 mid <- 0
-sigma <- 0.25
+sigma <- 0.1    # [0.1, 0.15, 0.2, 0.25]
 ngroup <- 3
 
 # Calling simulation functions 调用模拟函数
@@ -70,7 +69,7 @@ save_simulated_data(name, truecounts, counts, cellinfo, geneinfo)
 
 # Save the dataset as a CSV file 将数据集保存为 CSV 文件
 desktop_path <- "C:/Users/s2494280/Desktop"
-write.csv(counts, file.path(desktop_path, "signal3_0.25.csv"), row.names = FALSE)
+write.csv(counts, file.path(desktop_path, "signal3_01.csv"), row.names = FALSE)
 write.csv(cellinfo, file.path(desktop_path, "signal3_cellinfo.csv"), row.names = FALSE)
 write.csv(geneinfo, file.path(desktop_path, "signal3_geneinfo.csv"), row.names = FALSE)
 # 
@@ -109,12 +108,11 @@ calculate_group_prob <- function(retention, ngroup){
 }
 
 # Parameter settings 参数设置
-# name <- 'imbalanced6_X', X belong to [0.1, 0.3, 0.7, 0.9]
-name <- 'imbalanced6_0.9'
+name <- 'imbalanced6_0.9'     # [0.1, 0.3, 0.7, 0.9]
 mid <- 0.0
 sigma <- 0.4
 ngroup <- 6
-retention <- 0.9
+retention <- 0.9     # [0.1, 0.3, 0.7, 0.9]
 n_cells <- 1500
 
 # Calculate group_probe
@@ -140,7 +138,6 @@ save_simulated_data <- function(name, truecounts, counts, cellinfo, geneinfo) {
 
 # Save simulation data 保存模拟数据
 save_simulated_data(name, truecounts, counts, cellinfo, geneinfo)
-
 
 
 # Save the dataset as a CSV file
