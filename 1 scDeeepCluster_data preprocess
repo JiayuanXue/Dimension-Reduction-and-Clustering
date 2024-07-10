@@ -1,0 +1,25 @@
+import pandas as pd
+import h5py
+import numpy as np
+
+# Load csv files
+csv_file_path = './signal_0.3.csv'
+csv_data = pd.read_csv(csv_file_path)
+
+# Decompose data
+X = csv_data.drop(columns=['Group']).values.astype(np.float32)
+Y = csv_data['Group'].values.astype(np.float64)
+cell_name = np.array([f"Cell_{i}" for i in range(len(Y))], dtype='S24')
+gene_name = np.array([f"Gene_{i+1}" for i in range(X.shape[1])], dtype='S19')
+top_5000_indx = np.arange(X.shape[1]).astype(np.int64)  # 假设所有基因都是top 5000
+
+# Create new HDF5 files
+new_h5file_path = './data_0.3.h5'
+with h5py.File(new_h5file_path, 'w') as new_h5file:
+    new_h5file.create_dataset('X', data=X)
+    new_h5file.create_dataset('Y', data=Y)
+    new_h5file.create_dataset('cell_name', data=cell_name)
+    new_h5file.create_dataset('gene_name', data=gene_name)
+    new_h5file.create_dataset('top_5000_indx', data=top_5000_indx)
+
+print(f"New HDF5 file created at {new_h5file_path}")
