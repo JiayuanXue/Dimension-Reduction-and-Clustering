@@ -1,0 +1,51 @@
+import pandas as pd
+import h5py
+import numpy as np
+import scipy.sparse as sp
+
+# Load the CSV data
+csv_file_path = 'C:/Users/s2494280/Desktop/simul data/dropout/dropout_0.csv'
+csv_data = pd.read_csv(csv_file_path)
+
+# Split the data into expression matrix (X) and labels (Y)
+X = csv_data.drop(columns=['Group']).values
+Y = csv_data['Group'].values
+
+# Convert X to a sparse matrix
+X_sparse = sp.csr_matrix(X)
+
+# Define the HDF5 file path
+hdf5_file_path = 'C:/Users/s2494280/Desktop/dropout_0.5.h5'
+
+# Create HDF5 file and store data
+with h5py.File(hdf5_file_path, 'w') as f:
+    # Create exprs group and its datasets
+    exprs_group = f.create_group('exprs')
+    exprs_group.create_dataset('data', data=X_sparse.data, compression='gzip')
+    exprs_group.create_dataset('indices', data=X_sparse.indices, compression='gzip')
+    exprs_group.create_dataset('indptr', data=X_sparse.indptr, compression='gzip')
+    exprs_group.create_dataset('shape', data=X_sparse.shape, compression='gzip')
+
+    # Create obs group and its datasets
+    obs_group = f.create_group('obs')
+    obs_group.create_dataset('cell_type1', data=Y.astype('S'), compression='gzip')
+
+    # Create obs_names dataset
+    obs_names = np.arange(X_sparse.shape[0]).astype('S')
+    f.create_dataset('obs_names', data=obs_names, compression='gzip')
+
+    # Create var group and var_names dataset
+    var_group = f.create_group('var')
+    var_names = np.array(csv_data.columns[:-1]).astype('S')
+    f.create_dataset('var_names', data=var_names, compression='gzip')
+
+    # Create uns group
+    uns_group = f.create_group('uns')
+
+# Verification
+with h5py.File(hdf5_file_path, 'r') as f:
+    print("Top-level groups:", list(f.keys()))
+    print("exprs group datasets:", list(f['exprs'].keys()))
+    print("obs group datasets:", list(f['obs'].keys()))
+    print("var group datasets:", list(f['var'].keys()))
+    print("uns group datasets:", list(f['uns'].keys()))
