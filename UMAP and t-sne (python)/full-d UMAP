@@ -1,0 +1,30 @@
+import pandas as pd
+import umap
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+
+# Load data
+file_path = 'C:\\Users\\s2494280\\Desktop\\trail2.csv'
+data = pd.read_csv(file_path)
+
+# Separate features and grouping information
+features = data.iloc[:, :-1]  # Excluding the last column
+labels = data.iloc[:, -1]     # The last column serves as a label
+
+# Standardized data
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(features)
+
+# Applying UMAP for dimensionality reduction
+umap_reducer = umap.UMAP(n_components=2, random_state=42)
+embedding = umap_reducer.fit_transform(scaled_features)
+
+# Draw the reduced dimensional data points
+plt.figure(figsize=(12, 8))
+sns.scatterplot(x=embedding[:, 0], y=embedding[:, 1], hue=labels, palette='viridis', s=100, alpha=0.6, edgecolor='k')
+plt.title('UMAP Projection of the Cells Data')
+plt.xlabel('UMAP1')
+plt.ylabel('UMAP2')
+plt.legend(title='Group', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
