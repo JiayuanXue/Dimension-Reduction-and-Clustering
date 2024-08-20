@@ -1,0 +1,62 @@
+import matplotlib.pyplot as plt
+
+# Data for de.facScale
+de_facScale = [0.1, 0.15, 0.2, 0.25, 0.3]
+
+# Data for ARI
+ari_pca_kmeans = [0.003, 0.003, 0.002, 0.003, 0.005]
+ari_scdeepcluster = [0.002, 0.003, 0.184, 0.963, 0.995]
+ari_scdcc = [0.001, 0.000, 0.210, 0.766, 0.810]
+ari_scziDesk = [0.005, 0.046, 0.342, 0.948, 0.987]
+
+# Data for running time
+time_pca_kmeans = [36.29, 31.48, 32.38, 34.59, 32.62]
+time_scdeepcluster = [94, 92, 82, 82, 77]
+time_scdcc = [30, 33, 27, 26, 27]
+time_scziDesk = [28.979, 29.799, 29.473, 28.152, 28.065]
+
+# Plotting ARI
+plt.figure(figsize=(10, 6))
+plt.plot(de_facScale, ari_pca_kmeans, marker='o', linestyle='-', color='b', markersize=8, linewidth=2, label='PCA+kmeans')
+plt.plot(de_facScale, ari_scdeepcluster, marker='o', linestyle='-', color='r', markersize=8, linewidth=2, label='scDeepCluster')
+plt.plot(de_facScale, ari_scdcc, marker='o', linestyle='-', color='g', markersize=8, linewidth=2, label='scDCC')
+plt.plot(de_facScale, ari_scziDesk, marker='o', linestyle='-', color='purple', markersize=8, linewidth=2, label='scziDesk')
+
+# Adding data labels for ARI
+for i in range(len(de_facScale)):
+    plt.text(de_facScale[i], ari_pca_kmeans[i] + 0.03, f'{ari_pca_kmeans[i]:.3f}', fontsize=10, ha='center', color='b')
+    plt.text(de_facScale[i], ari_scdeepcluster[i] + 0.03, f'{ari_scdeepcluster[i]:.3f}', fontsize=10, ha='center', color='r')
+    plt.text(de_facScale[i], ari_scdcc[i] - 0.03, f'{ari_scdcc[i]:.3f}', fontsize=10, ha='center', color='g')
+    plt.text(de_facScale[i], ari_scziDesk[i] - 0.03, f'{ari_scziDesk[i]:.3f}', fontsize=10, ha='center', color='purple')
+
+plt.title('ARI vs de.facScale', fontsize=16)
+plt.xlabel('de.facScale', fontsize=14)
+plt.ylabel('ARI', fontsize=14)
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.xticks(de_facScale, fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=12)
+plt.show()
+
+# Plotting Running Time
+plt.figure(figsize=(10, 6))
+plt.plot(de_facScale, time_pca_kmeans, marker='o', linestyle='-', color='b', markersize=8, linewidth=2, label='PCA+kmeans')
+plt.plot(de_facScale, time_scdeepcluster, marker='o', linestyle='-', color='r', markersize=8, linewidth=2, label='scDeepCluster')
+plt.plot(de_facScale, time_scdcc, marker='o', linestyle='-', color='g', markersize=8, linewidth=2, label='scDCC')
+plt.plot(de_facScale, time_scziDesk, marker='o', linestyle='-', color='purple', markersize=8, linewidth=2, label='scziDesk')
+
+# Adding data labels for Running Time
+for i in range(len(de_facScale)):
+    plt.text(de_facScale[i], time_pca_kmeans[i] + 1.5, f'{time_pca_kmeans[i]:.2f}', fontsize=10, ha='center', color='b')
+    plt.text(de_facScale[i], time_scdeepcluster[i] + 1.5, f'{time_scdeepcluster[i]:.2f}', fontsize=10, ha='center', color='r')
+    plt.text(de_facScale[i], time_scdcc[i] - 2, f'{time_scdcc[i]:.2f}', fontsize=10, ha='center', color='g')
+    plt.text(de_facScale[i], time_scziDesk[i] - 2, f'{time_scziDesk[i]:.2f}', fontsize=10, ha='center', color='purple')
+
+plt.title('Running Time vs de.facScale', fontsize=16)
+plt.xlabel('de.facScale', fontsize=14)
+plt.ylabel('Running Time (seconds)', fontsize=14)
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.xticks(de_facScale, fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=12)
+plt.show()
