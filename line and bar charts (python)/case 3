@@ -1,0 +1,70 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data for retention
+retention = [0.1, 0.3, 0.5, 0.7, 0.9]
+
+# Data for ARI
+ari_pca_kmeans = [0.012, 0.006, 0.005, 0.004, 0.003]
+ari_scdeepcluster = [0.664, 0.757, 0.806, 0.811, 0.998]
+ari_scdcc = [0.598, 0.713, 0.666, 0.649, 0.697]
+ari_scziDesk = [1.000, 1.000, 1.000, 1.000, 1.000]
+
+# Data for running time
+time_pca_kmeans = [26.79, 32.16, 36.86, 27.82, 35.22]
+time_scdeepcluster = [80, 87, 79, 78, 74]
+time_scdcc = [25, 25, 25, 25, 25]
+time_scziDesk = [26.234, 27.194, 27.237, 27.793, 26.515]
+
+# Define width of bars
+bar_width = 0.2
+
+# Set positions for each bar group
+r1 = np.arange(len(retention))
+r2 = [x + bar_width for x in r1]
+r3 = [x + bar_width for x in r2]
+r4 = [x + bar_width for x in r3]
+
+# Plotting ARI
+plt.figure(figsize=(12, 7))
+plt.bar(r1, ari_pca_kmeans, color='b', width=bar_width, edgecolor='grey', label='PCA+kmeans')
+plt.bar(r2, ari_scdeepcluster, color='r', width=bar_width, edgecolor='grey', label='scDeepCluster')
+plt.bar(r3, ari_scdcc, color='g', width=bar_width, edgecolor='grey', label='scDCC')
+plt.bar(r4, ari_scziDesk, color='purple', width=bar_width, edgecolor='grey', label='scziDesk')
+
+# Adding data labels for ARI
+for i in range(len(retention)):
+    plt.text(r1[i], ari_pca_kmeans[i] + 0.02, f'{ari_pca_kmeans[i]:.3f}', ha='center', fontsize=10, color='b')
+    plt.text(r2[i], ari_scdeepcluster[i] + 0.02, f'{ari_scdeepcluster[i]:.3f}', ha='center', fontsize=10, color='r')
+    plt.text(r3[i], ari_scdcc[i] + 0.02, f'{ari_scdcc[i]:.3f}', ha='center', fontsize=10, color='g')
+    plt.text(r4[i], ari_scziDesk[i] + 0.02, f'{ari_scziDesk[i]:.3f}', ha='center', fontsize=10, color='purple')
+
+plt.xlabel('Retention', fontsize=14)
+plt.ylabel('ARI', fontsize=14)
+plt.xticks([r + bar_width for r in range(len(retention))], retention, fontsize=12)
+plt.title('ARI vs Retention', fontsize=16)
+plt.legend(fontsize=12)
+plt.grid(axis='y', linestyle='--', linewidth=0.5)
+plt.show()
+
+# Plotting Running Time
+plt.figure(figsize=(12, 7))
+plt.bar(r1, time_pca_kmeans, color='b', width=bar_width, edgecolor='grey', label='PCA+kmeans')
+plt.bar(r2, time_scdeepcluster, color='r', width=bar_width, edgecolor='grey', label='scDeepCluster')
+plt.bar(r3, time_scdcc, color='g', width=bar_width, edgecolor='grey', label='scDCC')
+plt.bar(r4, time_scziDesk, color='purple', width=bar_width, edgecolor='grey', label='scziDesk')
+
+# Adding data labels for Running Time
+for i in range(len(retention)):
+    plt.text(r1[i], time_pca_kmeans[i] + 0.5, f'{time_pca_kmeans[i]:.2f}', ha='center', fontsize=10, color='b')
+    plt.text(r2[i], time_scdeepcluster[i] + 0.5, f'{time_scdeepcluster[i]:.2f}', ha='center', fontsize=10, color='r')
+    plt.text(r3[i], time_scdcc[i] + 0.5, f'{time_scdcc[i]:.2f}', ha='center', fontsize=10, color='g')
+    plt.text(r4[i], time_scziDesk[i] + 0.5, f'{time_scziDesk[i]:.2f}', ha='center', fontsize=10, color='purple')
+
+plt.xlabel('Retention', fontsize=14)
+plt.ylabel('Running Time (seconds)', fontsize=14)
+plt.xticks([r + bar_width for r in range(len(retention))], retention, fontsize=12)
+plt.title('Running Time vs Retention', fontsize=16)
+plt.legend(fontsize=12)
+plt.grid(axis='y', linestyle='--', linewidth=0.5)
+plt.show()
