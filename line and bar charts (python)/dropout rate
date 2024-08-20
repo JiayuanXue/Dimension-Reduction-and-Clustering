@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+
+# Data extracted from the table
+dropout_mid = [0, 0.5, 1, 1.5, 2]
+dropout_rate = [17.83, 24.24, 31.92, 40.52, 49.68]
+
+# Creating the plot
+plt.figure(figsize=(8, 6))
+plt.plot(dropout_mid, dropout_rate, marker='o', linestyle='-', color='b', markersize=8, linewidth=2, label='Dropout Rate')
+
+# Adding titles and labels
+plt.title('Dropout Rate vs Dropout Mid', fontsize=16)
+plt.xlabel('Dropout Mid', fontsize=14)
+plt.ylabel('Dropout Rate (%)', fontsize=14)
+
+# Customizing the grid and ticks
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.xticks(dropout_mid, fontsize=12)
+plt.yticks(fontsize=12)
+
+# Adding data labels
+for i, rate in enumerate(dropout_rate):
+    plt.text(dropout_mid[i], rate + 1, f'{rate}%', fontsize=12, ha='center', color='black')  # ha='center' centers the text above the marker
+
+# Adding a legend
+plt.legend(fontsize=12)
+
+# Display the plot
+plt.show()
