@@ -1,0 +1,24 @@
+import pandas as pd
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+
+# Read CSV file
+file_path = r'C:\Users\s2494280\Desktop\32-d M2.csv'
+data = pd.read_csv(file_path, header=None)
+
+# Use the last column as the label column and the other columns as features
+labels = data.iloc[:, -1]
+data_features = data.iloc[:, :-1]
+
+# Using t-SNE for dimensionality reduction
+tsne = TSNE(n_components=2, random_state=42)
+data_tsne = tsne.fit_transform(data_features)
+
+# Draw a two-dimensional clustering diagram and color it according to categories
+plt.figure(figsize=(10, 8))
+scatter = plt.scatter(data_tsne[:, 0], data_tsne[:, 1], c=labels, cmap='viridis', s=50)
+plt.colorbar(scatter)
+plt.title('t-SNE Clustering')
+plt.xlabel('t-SNE 1')
+plt.ylabel('t-SNE 2')
+plt.show()
